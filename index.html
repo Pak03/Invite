@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#07070a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Oye Ale...</title>
+
+<style>
+  @font-face {
+    font-family: "Bigilla";
+    src: url("Bigilla.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    --bg: #07070a;
+    --panel: #0d0c11;
+    --border: rgba(126, 91, 161, .34);
+    --purple: #8565a8;
+    --purple-bright: #a183c4;
+    --text: #e7e3e9;
+    --muted: #9b96a1;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--bg);
+  }
+
+  body {
+    min-height: 100svh;
+    padding:
+      max(22px, env(safe-area-inset-top))
+      16px
+      max(22px, env(safe-area-inset-bottom));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+    font-family: "Bigilla", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+    background:
+      radial-gradient(
+        ellipse at 50% 18%,
+        rgba(105, 73, 137, .12) 0%,
+        rgba(105, 73, 137, .045) 28%,
+        transparent 58%
+      ),
+      #07070a;
+    overflow-x: hidden;
+  }
+
+  /* Very subtle atmosphere — no hearts, no romantic graphics */
+  body::before {
+    content: "";
+    position: fixed;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    border: 1px solid rgba(126, 91, 161, .07);
+    top: -130px;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .page {
+    width: 100%;
+    max-width: 540px;
+    text-align: center;
+  }
+  .card {
+    width: 100%;
+    padding: 28px 22px 25px;
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: rgba(13, 12, 17, .92);
+    box-shadow:
+      0 22px 65px rgba(0, 0, 0, .48),
+      inset 0 0 28px rgba(126, 91, 161, .025);
+  }
+
+  .message {
+    text-align: center;
+  }
+
+  .message p {
+    margin: 0;
+    color: #ddd9e0;
+    font-size: clamp(18px, 5vw, 20px);
+    line-height: 1.72;
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  .opening {
+    font-weight: 400;
+    color: #e7e3e9;
+  }
+
+  .question {
+    margin: 25px 0 19px;
+    color: #e8e4ea;
+    font-size: clamp(18px, 5vw, 20px);
+    line-height: 1.55;
+    font-weight: 700;
+  }
+
+  .choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 3px;
+  }
+
+  button {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    min-height: 58px;
+    border: 1px solid rgba(133, 101, 168, .42);
+    border-radius: 15px;
+    padding: 14px 12px;
+    background: #111016;
+    color: #e9e5eb;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+    transition:
+      transform .16s ease,
+      border-color .2s ease,
+      background .2s ease,
+      box-shadow .2s ease;
+  }
+
+  button:active {
+    transform: scale(.96);
+  }
+
+  #yes {
+    background: #17131c;
+    border-color: rgba(161, 130, 195, .62);
+    box-shadow: 0 0 22px rgba(105, 73, 137, .10);
+  }
+
+  #no {
+    color: #c6c1ca;
+  }
+
+  .choice-icon {
+    font-size: 19px;
+    margin-right: 7px;
+    vertical-align: -1px;
+  }
+
+  .result {
+    display: none;
+    text-align: center;
+    animation: appear .42s ease both;
+  }
+
+  .result.show {
+    display: block;
+  }
+
+  .result-symbol {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(133, 101, 168, .42);
+    border-radius: 50%;
+    color: var(--purple-bright);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 24px;
+  }
+
+  .reaction-gif {
+    display: block;
+    width: min(100%, 300px);
+    max-height: 260px;
+    object-fit: contain;
+    margin: 0 auto 20px;
+    border-radius: 14px;
+  }
+
+  .flow-gif {
+    display: block;
+    width: min(100%, 360px);
+    max-height: 300px;
+    object-fit: contain;
+    margin: 0 auto 22px;
+    border-radius: 14px;
+  }
+
+  .flow-button {
+    width: min(100%, 300px);
+    margin: 4px auto 0;
+    display: block;
+    background: #17131c;
+    border-color: rgba(161, 130, 195, .62);
+  }
+
+  .result h2 {
+    margin: 0 0 17px;
+    color: #e9e5eb;
+    font-size: clamp(24px, 7vw, 30px);
+    line-height: 1.25;
+    font-weight: 400;
+  }
+
+  .result p {
+    margin: 0;
+    color: #d8d4db;
+    font-size: clamp(18px, 5vw, 20px);
+    line-height: 1.65;
+  }
+
+  .result .accent {
+    color: var(--purple-bright);
+  }
+
+  .capture-note {
+    margin-top: 4px !important;
+    color: #817b87 !important;
+    font-size: 13px !important;
+    line-height: 1.45 !important;
+    font-style: italic;
+  }
+
+  .back {
+    display: none;
+    margin-top: 13px;
+    min-height: 47px;
+    border-color: rgba(133, 101, 168, .22);
+    background: transparent;
+    color: #8f8994;
+    font-size: 14px;
+  }
+  @keyframes appear {
+    from {
+      opacity: 0;
+      transform: translateY(9px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 380px) {
+    body {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+
+    .card {
+      padding: 24px 17px 21px;
+    }
+
+    .message p,
+    .question,
+    .result p {
+      font-size: 17px;
+    }
+
+    button {
+      font-size: 16px;
+    }
+  }
+</style>
+</head>
+
+<body>
+  <main class="page">
+    <section class="card">
+
+      <div id="message" class="message">
+        <p>
+          <span class="opening">Oye Ale...</span><br><br>
+          Sé que pasamos muchas cosas y que últimamente han habido muchos
+          cambios en nuestras vidas y honestamente no sé si este sea el
+          mejor momento, pero es viernes y pensé, ¿por qué no?
+          <br><br>
+          Seguramente tienes cosas que hacer, pero si quieres desconectarte
+          un rato, distraer la mente y pasar un buen momento, te tengo una
+          propuesta.
+        </p>
+
+        <div class="question">
+          ¿Te gustaría que nos viéramos hoy?
+        </div>
+
+        <div class="choices">
+          <button id="yes" type="button"><span class="choice-icon">✓</span></button>
+
+          <button id="no" type="button"><span class="choice-icon">✕</span></button>
+        </div>
+      </div>
+
+      <div id="yesResult" class="result" aria-live="polite">
+        <img class="flow-gif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaHViNGRtMG9tNDR6aTF6anpwYWVreWV6ZHU3dnY4Z2VndGZmZXV5YyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/5T6U8Vt43A6eMb3w8n/giphy.gif" alt="GIF 1">
+        <button id="seriously" class="flow-button" type="button">¿En serio?</button>
+      </div>
+
+      <div id="step2" class="result" aria-live="polite">
+        <img class="flow-gif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbHFqZnQ3Z2g4MHR1eTl5ZzV0NG1vbXBscHlwZ3huNGh2dHZhZjZuZyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Cdkk6wFFqisTe/giphy.gif" alt="GIF 2">
+        <button id="sure" class="flow-button" type="button">¿Segura?</button>
+      </div>
+
+      <div id="step3" class="result" aria-live="polite">
+        <img class="flow-gif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExenRzb240bGlobXZ0b3VreWI3dHN2eng0NHI4YTY1dnp0YzRsZnVpZiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xSM46ernAUN3y/giphy.gif" alt="GIF 3">
+        <button id="okay" class="flow-button" type="button">¿Está bien?</button>
+      </div>
+
+      <div id="step4" class="result" aria-live="polite">
+        <img class="flow-gif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdXZlOXVwaHZpcXdsbG50bjl0aXI4cmUyNjc0NWlkejhxODVlMjV2dCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/lKv5wJrPzcr3G/giphy.gif" alt="GIF 4">
+        <h2><strong>Paso por ti a las 7.</strong></h2>
+        <p class="capture-note">(Mándame captura si llegaste hasta acá.)</p>
+      </div>
+
+      <div id="noResult"      <div id="noResult" class="result" aria-live="polite">
+        <img class="reaction-gif" src="https://media1.tenor.com/m/s85UU1L28CwAAAAd/lol-omg-lol.gif" alt="GIF de risa" loading="eager">
+        <h2>Lástima.</h2>
+        <p>
+          Si en algún momento cambias de opinión...
+        </p>
+      </div>
+
+    </section>
+
+    <button id="back" class="back" type="button">Volver</button>
+
+  </main>
+
+<script>
+(function () {
+  "use strict";
+
+  var message = document.getElementById("message");
+  var yesResult = document.getElementById("yesResult");
+  var step2 = document.getElementById("step2");
+  var step3 = document.getElementById("step3");
+  var step4 = document.getElementById("step4");
+  var noResult = document.getElementById("noResult");
+  var back = document.getElementById("back");
+
+  var screens = [yesResult, step2, step3, step4, noResult];
+
+  function show(screen) {
+    message.style.display = "none";
+    screens.forEach(function (item) {
+      item.classList.remove("show");
+    });
+    screen.classList.add("show");
+    back.style.display = "block";
+    window.scrollTo(0, 0);
+  }
+
+  document.getElementById("yes").addEventListener("click", function () {
+    show(yesResult);
+  });
+
+  document.getElementById("no").addEventListener("click", function () {
+    show(noResult);
+  });
+
+  document.getElementById("seriously").addEventListener("click", function () {
+    show(step2);
+  });
+
+  document.getElementById("sure").addEventListener("click", function () {
+    show(step3);
+  });
+
+  document.getElementById("okay").addEventListener("click", function () {
+    show(step4);
+  });
+
+  back.addEventListener("click", function () {
+    screens.forEach(function (item) {
+      item.classList.remove("show");
+    });
+    message.style.display = "block";
+    back.style.display = "none";
+    window.scrollTo(0, 0);
+  });
+})();
+</script>
+</body>
+</html>
