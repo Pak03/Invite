@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,7 +7,7 @@
 <meta name="theme-color" content="#07070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Oye Ale...</title>
+<title>Oye, Alejandra...</title>
 
 <style>
   @font-face {
@@ -244,6 +245,20 @@
     font-style: italic;
   }
 
+  .exit-button {
+    width: min(100%, 300px);
+    margin: 22px auto 0;
+    display: block;
+    min-height: 47px;
+    background: transparent;
+    border-color: rgba(161, 130, 195, .38);
+    color: #9c96a3;
+  }
+
+  .exit-button:active {
+    transform: scale(.98);
+  }
+
   .back {
     display: none;
     margin-top: 13px;
@@ -296,7 +311,7 @@
           <span class="opening">Oye, Alejandra...</span><br><br>
           Ya sé que pasamos muchas cosas, que últimamente han habido muchos
           cambios en nuestras vidas y honestamente no sé si este sea el
-          mejor momento, pero pues si ya te he estado escribiendo, solo pensé, ¿por qué no? 
+          mejor momento, pero pues si ya te he estado escribiendo, solo pensé, ¿por qué no?
           <br><br>
           Seguramente tienes cosas que hacer, pero si quieres desconectarte
           un rato, distraer la mente y pasar un buen momento, te tengo una
@@ -331,16 +346,18 @@
 
       <div id="step4" class="result" aria-live="polite">
         <img class="flow-gif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdXZlOXVwaHZpcXdsbG50bjl0aXI4cmUyNjc0NWlkejhxODVlMjV2dCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/lKv5wJrPzcr3G/giphy.gif" alt="GIF 4">
-        <h2><strong>Paso por ti a las 7.</strong></h2>
+        <h2><strong>Paso por ti a las 8.</strong></h2>
         <p class="capture-note">(Mándame captura si llegaste hasta acá.)</p>
+        <button id="exitYes" class="exit-button" type="button">Salir</button>
       </div>
 
-      <div id="noResult"      <div id="noResult" class="result" aria-live="polite">
+      <div id="noResult" class="result" aria-live="polite">
         <img class="reaction-gif" src="https://media1.tenor.com/m/s85UU1L28CwAAAAd/lol-omg-lol.gif" alt="GIF de risa" loading="eager">
-        <h2>Lástima...</h2>
+        <h2></h2>
         <p>
-          Cuando cambies de opinión...
+          Esta bien, ojala cambies de opinión...
         </p>
+        <button id="exitNo" class="exit-button" type="button">Salir</button>
       </div>
 
     </section>
@@ -369,8 +386,24 @@
       item.classList.remove("show");
     });
     screen.classList.add("show");
-    back.style.display = "block";
+
+    // "Volver" is useful during the flow, but the final screens only show "Salir".
+    if (screen === step4 || screen === noResult) {
+      back.style.display = "none";
+    } else {
+      back.style.display = "block";
+    }
+
     window.scrollTo(0, 0);
+  }
+
+  function exitPage() {
+    // Browsers only allow window.close() for windows opened by script.
+    // If this page was opened normally, fall back to a blank page.
+    window.close();
+    setTimeout(function () {
+      window.location.replace("about:blank");
+    }, 150);
   }
 
   document.getElementById("yes").addEventListener("click", function () {
@@ -392,6 +425,9 @@
   document.getElementById("okay").addEventListener("click", function () {
     show(step4);
   });
+
+  document.getElementById("exitYes").addEventListener("click", exitPage);
+  document.getElementById("exitNo").addEventListener("click", exitPage);
 
   back.addEventListener("click", function () {
     screens.forEach(function (item) {
